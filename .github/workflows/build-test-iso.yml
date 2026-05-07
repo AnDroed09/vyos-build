@@ -25,6 +25,7 @@ jobs:
       - name: Build vyos-1x .deb AND ISO inside Docker
         run: |
           docker run --rm --privileged \
+            --user root \
             -v "$(pwd)":/vyos \
             -w /vyos \
             vyos/vyos-build:current \
