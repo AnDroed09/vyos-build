@@ -36,7 +36,7 @@ jobs:
               mkdir -p /vyos/packages && \
               cp /vyos/*.deb /vyos/packages/ && \
               cd /vyos && \
-              python3 /vyos/build-vyos-image generic \
+              python3 /vyos/scripts/image-build/build-vyos-image generic \
                 --architecture amd64 \
                 --build-by test@test.com \
                 --build-type release \
