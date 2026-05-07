@@ -31,13 +31,12 @@ jobs:
             -w /vyos \
             vyos/vyos-build:current \
             bash -c "
-              whoami && id && \
               cd /vyos/vyos-1x-src && \
               dpkg-buildpackage -uc -us -b && \
               mkdir -p /vyos/packages && \
               cp /vyos/*.deb /vyos/packages/ && \
               cd /vyos && \
-              bash /vyos/build-vyos-image generic \
+              python3 /vyos/build-vyos-image generic \
                 --architecture amd64 \
                 --build-by test@test.com \
                 --build-type release \
