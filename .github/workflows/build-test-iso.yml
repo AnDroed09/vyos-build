@@ -32,7 +32,8 @@ jobs:
               cd /vyos/vyos-1x-src && \
               dpkg-buildpackage -uc -us -b && \
               ls /vyos/*.deb && \
-              cp /vyos/*.deb packages/ && \
+              mkdir -p /vyos/packages && \
+              cp /vyos/*.deb /vyos/packages/ && \
               sudo --preserve-env ./build-vyos-image generic \
                 --architecture amd64 \
                 --build-by test@test.com \
