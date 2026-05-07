@@ -1,0 +1,63 @@
+name: Build Test ISO (PR #5123 + PR #1159)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout vyos-build (PR #1159 branch)
+        uses: actions/checkout@v4
+        with:
+          repository: vyos/vyos-build
+          ref: current
+          fetch-depth: 0
+
+      - name: Merge PR #1159 from vyos-build
+        run: |
+          git config user.email "ci@test.com"
+          git config user.name "CI"
+          git fetch origin pull/1159/head:pr-build-1159
+          git merge pr-build-1159 --no-edit
+
+      - name: Checkout vyos-1x (PR #5123 — ветка ddclient-v4)
+        uses: actions/checkout@v4
+        with:
+          repository: indrajitr/vyos-1x
+          ref: ddclient-v4
+          path: vyos-1x-src
+
+      - name: Build vyos-1x .deb
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y dpkg-dev debhelper python3 dh-python
+          cd vyos-1x-src
+          dpkg-buildpackage -uc -us -b
+          cd ..
+          ls -la *.deb
+          mv *.deb packages/
+
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build VyOS ISO
+        run: |
+          docker run --rm --privileged \
+            -v "$(pwd)":/vyos \
+            -w /vyos \
+            vyos/vyos-build:current \
+            sudo ./build-vyos-image generic \
+              --architecture amd64 \
+              --build-by "test@test.com" \
+              --build-type release \
+              --version 1.5-test-pr5123
+
+      - name: Upload ISO artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vyos-test-pr5123-iso
+          path: build/*.iso
+          retention-days: 5
