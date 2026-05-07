@@ -31,8 +31,8 @@ jobs:
             bash -c "
               cd /vyos/vyos-1x-src && \
               dpkg-buildpackage -uc -us -b && \
-              cd /vyos && \
-              cp ../*.deb packages/ && \
+              ls /vyos/*.deb && \
+              cp /vyos/*.deb packages/ && \
               sudo --preserve-env ./build-vyos-image generic \
                 --architecture amd64 \
                 --build-by test@test.com \
